@@ -92,7 +92,7 @@ installerhandlermodule.setUpSystemd = ->
 installerhandlermodule.stopRemoveService = ->
     log "installerhandlermodule.stopRemoveService"
     script = "scripts/stop-and-remove-service.pl"
-    p1 = await utl.executePerl(script, "commander", true)
+    p1 = utl.executePerl(script, "commander", true)
     p2 = utl.executePerl(script, "installer", false)
     await Promise.all([p1, p2])
     return
