@@ -10,13 +10,16 @@ machineConfig  = require("../../../sources/machine-config")
 
 ############################################################
 digestPath = "install-digest.json"
+webhookConfigPath = "webhook-config.json"
 
 ############################################################
 configmodule.initialize = () ->
     log "configmodule.initialize"
-    try readInstallDigest()
+    try 
+        readInstallDigest()
+        readWebhookConfig()
     catch err
-        log "could not read install Digest!"
+        log "could not read {"+digestPath+" or "+webhookConfigPath+"}!"
         log err
     return
 
@@ -27,10 +30,18 @@ readInstallDigest = ->
     configmodule.installDigest = JSON.parse(digestString)
     return
 
+readWebhookConfig = ->
+    webhookConfigString = String(fs.readFileSync(webhookConfigPath))
+    webhookConfig = JSON.parse(webhookConfigString)
+    configmodule.commandMap = webhookConfig.commandMap
+    if !configmodule.commandMap then throw "WebhookConfig had no commandMap!" 
+    return
+
 ############################################################
 #region exposedVariables
 configmodule.thingies = machineConfig.thingies
 configmodule.installDigest = {}
+configmodule.commanderSocketPath = "/run/commander.sk"
 #endregion
 
 ############################################################

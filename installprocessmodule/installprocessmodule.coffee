@@ -8,6 +8,9 @@ print = console.log
 #endregion
 
 ############################################################
+fs = require "fs"
+
+############################################################
 #region localModules
 cfg = null
 utl = null
@@ -20,6 +23,7 @@ deploymentUser = null
 #region internalProperties
 installerThingy = null
 installerDigest = null
+updateCodes = []
 #endregion
 
 ############################################################
@@ -87,6 +91,33 @@ certInstallFor = (thingy) ->
     await utl.executeCertbot(thingy.homeUser, domains, thingy.outsidePort)
     return 
 
+sendUpdateCodes = ->
+    log "sendUpdateCodes"
+    writeCommand(code) for code in updateCodes
+    return
+
+writeCommand = (command) ->
+    log "writeCommand"
+    log command
+    try
+        openSocket = fs.openSync cfg.commanderSocketPath, 'a'
+        fs.appendFileSync openSocket, command
+    catch err
+        print 'Command could not be written to socket!'
+    return
+
+addAllUpdateCodes = () ->
+    log "addAllUpdateCodes"
+    addUpdateCodeFor(thingy) for thingy in cfg.thingies
+    return
+    
+addUpdateCodeFor = (thingy) ->
+    log "addUpdateCodeFor"
+    code = "" + cfg.commandMap[thingy.repository] + "\n"
+    if updateCodes.includes(code) then return
+    updateCodes.push(code)
+    return
+
 ############################################################
 #region installerFunctions
 installThingy = (thingy) ->
@@ -96,6 +127,7 @@ installThingy = (thingy) ->
         when "website" then await installWebsite(thingy)
         when "service" then await installService(thingy)
         else log "We encountered a unknown type: " + thingy.type
+    addUpdateCodeFor(thingy)
     return
 
 ############################################################
@@ -221,6 +253,7 @@ updateThingy = (thingy, digest) ->
         when "website" then await updateWebsite(thingy, digest)
         when "service" then await updateService(thingy, digest)
         else log "We encountered an unknown type: " + thingy.type
+    addUpdateCodeFor(thingy)
     return
 
 removeThingyForDigest = (digest) ->
@@ -248,11 +281,13 @@ updateInstaller = (thingy, digest) ->
             await installer.copyFiles()
             print "successfull file update: " + thingy.homeUser
         
+        if newFileDigest.commanderScript.hash != digest.commanderScript.hash then addAllUpdateCodes()
+
         if newFileDigest.privateKey.hash != digest.privateKey.hash
             await installer.copyKeys(thingy)
             print "successfull key update: " + thingy.homeUser
 
-        if newFileDigest.socketFile.hash != digest.socketFile.hash or newFileDigest.serviceFile.hash != digest.serviceFile.hash
+        if newFileDigest.commanderSocketFile.hash != digest.commanderSocketFile.hash or newFileDigest.commanderServiceFile.hash != digest.commanderServiceFile.hash or newFileDigest.installerServiceFile.hash != digest.installerServiceFile.hash
             await installer.stopRemoveService()
             await installer.setUpSystemd()
             print "successfull systemd update: " + thingy.homeUser
@@ -357,6 +392,9 @@ installprocessmodule.execute = (update) ->
     print "doing cert setup..."
     await certSetup()
     
+    print "sending updateCodes... " + updateCodes
+    sendUpdateCodes()
+
     return true
     
 export default installprocessmodule

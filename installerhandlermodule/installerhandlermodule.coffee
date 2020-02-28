@@ -28,10 +28,12 @@ installerhandlermodule.generateInstallerFileDigest = (thingy) ->
             path: "webhook-config.json"
         privateKey:
             path:  "keys/" + thingy.repository
-        socketFile:
+        commanderSocketFile:
             path: "service-files/commander.socket"
-        serviceFile:
+        commanderServiceFile:
             path: "service-files/commander.service"
+        installerServiceFile:
+            path: "service-files/installer.service"
     return await hasher.hashAllFiles(allFiles)
 
 ############################################################
@@ -52,6 +54,7 @@ installerhandlermodule.copyFiles = ->
     configFile = "webhook-config.json"
     destPath = "/home/webhook-handler/webhook-config.json"
     p2 = utl.executeCP(configFile, destPath)
+
 
     await Promise.all([p1, p2])
 
@@ -81,12 +84,18 @@ installerhandlermodule.prepareInstallerUser = (thingy) ->
 installerhandlermodule.setUpSystemd = ->
     log "installerhandlermodule.setUpSystemd"
     script = "scripts/copy-and-run-service.pl" 
-    await utl.executePerl(script, "commander", true)
+    p1 = utl.executePerl(script, "commander", true)
+    p2 = utl.executePerl(script, "installer", false)
+    await Promise.all([p1, p2])
+    return
 
 installerhandlermodule.stopRemoveService = ->
     log "installerhandlermodule.stopRemoveService"
     script = "scripts/stop-and-remove-service.pl"
-    await utl.executePerl(script, "commander", true)
+    p1 = await utl.executePerl(script, "commander", true)
+    p2 = utl.executePerl(script, "installer", false)
+    await Promise.all([p1, p2])
+    return
 
 #endregion exposed functions
 
