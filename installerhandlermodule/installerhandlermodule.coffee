@@ -84,16 +84,16 @@ installerhandlermodule.prepareInstallerUser = (thingy) ->
 installerhandlermodule.setUpSystemd = ->
     log "installerhandlermodule.setUpSystemd"
     script = "scripts/copy-and-run-service.pl" 
-    p1 = utl.executePerl(script, "commander", true)
-    p2 = utl.executePerl(script, "installer")
+    p1 = utl.executePerl(script, "commander", "socket")
+    p2 = utl.executePerl(script, "installer", "norun")
     await Promise.all([p1, p2])
     return
 
 installerhandlermodule.stopRemoveService = ->
     log "installerhandlermodule.stopRemoveService"
     script = "scripts/stop-and-remove-service.pl"
-    p1 = utl.executePerl(script, "commander", true)
-    p2 = utl.executePerl(script, "installer")
+    p1 = utl.executePerl(script, "commander", "socket")
+    p2 = utl.executePerl(script, "installer", "norun")
     await Promise.all([p1, p2])
     return
 

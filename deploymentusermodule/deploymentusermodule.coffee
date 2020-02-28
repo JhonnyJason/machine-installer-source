@@ -96,7 +96,7 @@ deploymentusermodule.setUpSystemd = (thingy) ->
     script = "scripts/copy-and-run-service.pl"
     username = thingy.homeUser    
     
-    if thingy.socket then result = await utl.executePerl(script, username, thingy.socket)
+    if thingy.socket then result = await utl.executePerl(script, username, "socket")
     else result = await utl.executePerl(script, username)
     return result
 
