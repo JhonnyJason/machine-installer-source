@@ -93,7 +93,7 @@ certInstallFor = (thingy) ->
 
 sendUpdateCodes = ->
     log "sendUpdateCodes"
-    writeCommand(code) for code in updateCodes
+    writeCommand(""+code+"\n") for code in updateCodes
     return
 
 writeCommand = (command) ->
@@ -113,7 +113,7 @@ addAllUpdateCodes = () ->
     
 addUpdateCodeFor = (thingy) ->
     log "addUpdateCodeFor"
-    code = "" + cfg.commandMap[thingy.repository] + "\n"
+    code = cfg.commandMap[thingy.repository]
     if updateCodes.includes(code) then return
     updateCodes.push(code)
     return
@@ -253,7 +253,6 @@ updateThingy = (thingy, digest) ->
         when "website" then await updateWebsite(thingy, digest)
         when "service" then await updateService(thingy, digest)
         else log "We encountered an unknown type: " + thingy.type
-    addUpdateCodeFor(thingy)
     return
 
 removeThingyForDigest = (digest) ->
@@ -311,6 +310,7 @@ updateWebsite = (thingy, digest) ->
         if digest.selfHash != newHash or digest.success == false
             await removeWebsite(thingy)
             await installWebsite(thingy)
+            addUpdateCodeFor(thingy)
             return
         
         if newFileDigest.nginxConfig.hash != digest.nginxConfig.hash
@@ -323,7 +323,6 @@ updateWebsite = (thingy, digest) ->
 
         Object.assign(digest, newFileDigest)
         cfg.installDigest[thingy.homeUser] = digest
-
         cfg.installDigest[thingy.homeUser].success = true
     catch err
         print "could not install: " + thingy.homeUser
@@ -340,6 +339,7 @@ updateService = (thingy, digest) ->
         if digest.selfHash != newHash or digest.success == false
             await removeService(thingy)
             await installService(thingy)
+            addUpdateCodeFor(thingy)
             return
         
         if newFileDigest.nginxConfig.hash != digest.nginxConfig.hash
@@ -360,7 +360,6 @@ updateService = (thingy, digest) ->
 
         Object.assign(digest, newFileDigest)
         cfg.installDigest[thingy.homeUser] = digest
-
         cfg.installDigest[thingy.homeUser].success = true
     catch err
         print "could not install: " + thingy.homeUser
