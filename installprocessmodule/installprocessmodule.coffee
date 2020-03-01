@@ -93,14 +93,16 @@ certInstallFor = (thingy) ->
 
 sendUpdateCodes = ->
     log "sendUpdateCodes"
+    writeCommand("0\n")
     writeCommand(""+code+"\n") for code in updateCodes
+    writeCommand("-1\n")
     return
 
 writeCommand = (command) ->
     log "writeCommand"
     log command
     try
-        openSocket = fs.openSync cfg.commanderSocketPath, 'a'
+        openSocket = fs.openSync cfg.executorSocketPath, 'a'
         fs.appendFileSync openSocket, command
     catch err
         print 'Command could not be written to socket!'
@@ -276,17 +278,17 @@ updateInstaller = (thingy, digest) ->
             await installInstaller(thingy)
             return
         
-        if newFileDigest.commanderScript.hash != digest.commanderScript.hash or  newFileDigest.webhookConfig.hash != digest.webhookConfig.hash
+        if newFileDigest.executorScript.hash != digest.executorScript.hash or  newFileDigest.webhookConfig.hash != digest.webhookConfig.hash
             await installer.copyFiles()
             print "successfull file update: " + thingy.homeUser
         
-        if newFileDigest.commanderScript.hash != digest.commanderScript.hash then addAllUpdateCodes()
+        if newFileDigest.executorScript.hash != digest.executorScript.hash then addAllUpdateCodes()
 
         if newFileDigest.privateKey.hash != digest.privateKey.hash
             await installer.copyKeys(thingy)
             print "successfull key update: " + thingy.homeUser
 
-        if newFileDigest.commanderSocketFile.hash != digest.commanderSocketFile.hash or newFileDigest.commanderServiceFile.hash != digest.commanderServiceFile.hash or newFileDigest.installerServiceFile.hash != digest.installerServiceFile.hash
+        if newFileDigest.executorSocketFile.hash != digest.executorSocketFile.hash or newFileDigest.executorServiceFile.hash != digest.executorServiceFile.hash or newFileDigest.installerServiceFile.hash != digest.installerServiceFile.hash
             await installer.stopRemoveService()
             await installer.setUpSystemd()
             print "successfull systemd update: " + thingy.homeUser

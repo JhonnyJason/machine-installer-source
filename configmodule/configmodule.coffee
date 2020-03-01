@@ -41,7 +41,7 @@ readWebhookConfig = ->
 #region exposedVariables
 configmodule.thingies = machineConfig.thingies
 configmodule.installDigest = {}
-configmodule.commanderSocketPath = "/run/commander.sk"
+configmodule.executorSocketPath = "/run/executor.sk"
 #endregion
 
 ############################################################
