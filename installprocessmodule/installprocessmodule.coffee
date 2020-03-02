@@ -93,7 +93,7 @@ certInstallFor = (thingy) ->
 
 sendUpdateCodes = ->
     log "sendUpdateCodes"
-    updateCodes.flat()
+    updateCodes = updateCodes.flat()
     writeCommand("0\n")
     writeCommand(""+code+"\n") for code in updateCodes
     writeCommand("-1\n")
