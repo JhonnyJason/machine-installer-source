@@ -17,7 +17,7 @@ debugmodule.modulesToDebug =
     # installprocessmodule: true
     # servicefilesmodule: true
     # startupmodule: true
-    # utilmodule: true
+    utilmodule: true
     
 #region exposed variables
 
