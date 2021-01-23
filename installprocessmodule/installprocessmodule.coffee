@@ -42,7 +42,7 @@ installProcess = ->
     log "installProcess"
     cfg.installDigest = {}
     promises = (installThingy(thingy) for thingy in cfg.thingies)
-    olog cfg.thingies
+    print JSON.stringify(cfg.thingies, null, 4)
     await Promise.all(promises)
     print "I was here !!! - - - - - - - - - - !!!"
     await installInstaller(installerThingy)
@@ -119,6 +119,8 @@ addAllUpdateCodes = () ->
     
 addUpdateCodeFor = (thingy) ->
     log "addUpdateCodeFor"
+    log JSON.stringify(cfg.commandMap)
+    log thingy.repository
     code = cfg.commandMap[thingy.repository]
     if updateCodes.includes(code) then return
     updateCodes.push(code)
