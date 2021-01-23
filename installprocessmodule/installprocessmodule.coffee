@@ -42,8 +42,11 @@ installProcess = ->
     log "installProcess"
     cfg.installDigest = {}
     promises = (installThingy(thingy) for thingy in cfg.thingies)
+    olog cfg.thingies
     await Promise.all(promises)
+    print "I was here !!! - - - - - - - - - - !!!"
     await installInstaller(installerThingy)
+    print "I was here after !!! - - - - - - - - - - !!!"
     cfg.writeInstallDigest()
     return
 
