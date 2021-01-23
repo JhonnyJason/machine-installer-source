@@ -14,7 +14,7 @@ debugmodule.modulesToDebug =
     # githubremotemodule: true
     # hashermodule: true
     # installerhandlermodule: true
-    # installprocessmodule: true
+    installprocessmodule: true
     # servicefilesmodule: true
     # startupmodule: true
     utilmodule: true
