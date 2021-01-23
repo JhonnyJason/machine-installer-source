@@ -15,12 +15,10 @@ webhookConfigPath = "webhook-config.json"
 ############################################################
 configmodule.initialize = () ->
     log "configmodule.initialize"
-    try 
-        readInstallDigest()
-        readWebhookConfig()
-    catch err
-        log "could not read {"+digestPath+" or "+webhookConfigPath+"}!"
-        log err
+    try readInstallDigest()
+    catch err then log "could not read: " + digestPath + "!\n"+err
+    try readWebhookConfig()
+    catch err then log "could not read: "+webhookConfigPath+"!\n"+err
     return
 
 ############################################################

@@ -9,7 +9,7 @@ debugmodule.initialize = () ->
     
 debugmodule.modulesToDebug = 
     unbreaker: true
-    # configmodule: true
+    configmodule: true
     # deploymentusermodule: true
     # githubremotemodule: true
     # hashermodule: true
